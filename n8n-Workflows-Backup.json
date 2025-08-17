@@ -1,0 +1,376 @@
+{
+  "name": "n8n-Workflows-Backup",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -380,
+        35
+      ],
+      "id": "3e4d92b4-b1b4-423c-8955-5c7d3824c858",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:5678/api/v1/workflows",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -160,
+        35
+      ],
+      "id": "b8f388fe-19e0-470e-b937-874f96bb70c8",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "T0kLlqRUrEV01ypE",
+          "name": "n8n API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        60,
+        35
+      ],
+      "id": "debfd5c4-5a1b-4d8f-863e-4f7f2c1a5342",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "format": true,
+          "fileName": "={{ $json.name }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        500,
+        35
+      ],
+      "id": "04846f7e-e20c-4461-a278-1a36e3e3711e",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "MuhammadAbdullah80",
+          "mode": "list",
+          "cachedResultName": "MuhammadAbdullah80",
+          "cachedResultUrl": "https://github.com/MuhammadAbdullah80"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "n8n",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://github.com/MuhammadAbdullah80/n8n"
+        },
+        "filePath": "={{ $('Split Out').item.json.name }}.json",
+        "binaryData": true,
+        "binaryPropertyName": "=data",
+        "commitMessage": "none"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        1160,
+        35
+      ],
+      "id": "1a54eb0d-248d-4efc-afce-3b51e74fe90c",
+      "name": "Create a file",
+      "webhookId": "14f8123c-b9ad-448e-b4c5-c092482534f6",
+      "alwaysOutputData": true,
+      "credentials": {
+        "githubOAuth2Api": {
+          "id": "eXKpJZ0zf7n6h0fl",
+          "name": "GitHub account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "MuhammadAbdullah80",
+          "mode": "list",
+          "cachedResultName": "MuhammadAbdullah80",
+          "cachedResultUrl": "https://github.com/MuhammadAbdullah80"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "n8n",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://github.com/MuhammadAbdullah80/n8n"
+        },
+        "filePath": "={{ $('Split Out').item.json.name }}.json",
+        "binaryData": true,
+        "binaryPropertyName": "=data",
+        "commitMessage": "none"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        940,
+        -40
+      ],
+      "id": "58bbc683-1eb3-49cd-a9e7-554270efc982",
+      "name": "Edit a file",
+      "webhookId": "14f8123c-b9ad-448e-b4c5-c092482534f6",
+      "alwaysOutputData": true,
+      "credentials": {
+        "githubOAuth2Api": {
+          "id": "eXKpJZ0zf7n6h0fl",
+          "name": "GitHub account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        720,
+        35
+      ],
+      "id": "d582b937-73cf-4954-bbc6-8bfa835076e3",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "635fe52a-3110-4081-af7f-62c2326d0df2",
+              "leftValue": "={{ $json.isArchived }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        280,
+        35
+      ],
+      "id": "954d0b96-2619-4092-b21c-4da9096edd8b",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "content": "## Main Workflow\n",
+        "height": 500,
+        "width": 1880,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -440,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "eb4a7b98-7037-4117-a82a-80ff91c77c40",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Edit Here!\nUse your\nn8n API\n",
+        "height": 100,
+        "width": 150,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -180,
+        -100
+      ],
+      "typeVersion": 1,
+      "id": "2de0e07f-8fb1-4d92-a624-f097fcbcc006",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Edit Here!\nUse your\nGitHub Account\n",
+        "height": 100,
+        "width": 150,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1120,
+        -140
+      ],
+      "typeVersion": 1,
+      "id": "ccfd9263-ee40-48a6-bfc8-5302a0ad3016",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit a file": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Create a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Create a file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "297f0827-4170-430f-a841-8f6de1ef233c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3a6d8d6fd4a6dbf58f8b439b2fe1c587f1c9acd714a5247e2864e55f481f576e"
+  },
+  "id": "5WVl1nG35VZQEWVd",
+  "tags": []
+}
