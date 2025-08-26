@@ -1,8 +1,8 @@
-# n8n Backup Workflows
+# n8n Backup and Retrieval Workflows
 
-This project contains three n8n workflows that automatically back up your **n8n workflows** and **credentials** to GitHub.
+This project contains a set of n8n workflows that automatically **back up** and **retrieve** your n8n workflows and credentials with GitHub integration.
 
-These backups are essential if you are running n8n locally, because without them you risk losing all your data if something goes wrong. With backups in GitHub, you can always restore your work safely.
+These workflows are essential if you are running n8n locally, because without them you risk losing all your data if something goes wrong. With backups in GitHub, you can always restore your work safely. Retrieval workflows make the process two-way, ensuring you can also restore workflows and credentials back into n8n when required.
 
 ---
 
@@ -22,6 +22,23 @@ These backups are essential if you are running n8n locally, because without them
   - Credentials Backup  
 - Ideal if you want a one-click solution for backing up everything together.  
 
+### 4. n8n-Workflow-Retrieval
+- Retrieves workflows from GitHub and creates them in n8n.  
+- Requires access to **GitHub** and **n8n** only.  
+- Useful for restoring workflows or syncing them across different n8n instances.  
+
+### 5. n8n-Credentials-Retrieval
+- Retrieves credentials from GitHub and creates them in n8n.  
+- Requires access to **GitHub**, **n8n**, and a **Google Sheet** for mapping.  
+- The Google Sheet should contain three columns:  
+  1. **ID in GitHub**  
+  2. **ID in n8n**  
+  3. **Match Formula**:  
+     ```excel
+     =IF(AND($A2<>$B2, $B2<>""), "No", "Yes")
+     ```  
+- This mapping ensures credentials are correctly matched and restored without duplication.  
+
 ---
 
 ## Getting Started
@@ -37,9 +54,11 @@ These backups are essential if you are running n8n locally, because without them
    - Import the workflow you need.  
    - Add your GitHub repository URL, branch, and personal access token.  
    - For **Workflows Backup**, also configure your n8n API connection (see [n8n API docs](https://docs.n8n.io)).  
+   - For **Credentials Retrieval**, configure access to your Google Sheet for ID mapping.  
 
-4. **Run or Schedule Backups**  
-   - Trigger manually or schedule with Cron inside n8n.  
+4. **Run or Schedule**  
+   - Backups: Trigger manually or schedule with Cron inside n8n.  
+   - Retrievals: Run whenever you need to restore workflows or credentials.  
 
 ---
 
@@ -48,6 +67,7 @@ These backups are essential if you are running n8n locally, because without them
 - Always back up credentials in a private repository.  
 - If workflows contain sensitive information, use a private repository as well.  
 - Never share your GitHub personal access token or credentials publicly.  
+- Avoid backing up workflows with **pinned data**, as this may unintentionally expose personal keys or sensitive information.  
 
 ---
 
@@ -55,6 +75,8 @@ These backups are essential if you are running n8n locally, because without them
 
 With these workflows, you can:  
 - Back up your n8n workflows and credentials to GitHub.  
-- Keep everything version-controlled and recoverable.  
+- Retrieve workflows and credentials from GitHub into n8n.  
+- Keep everything version-controlled, recoverable, and portable.  
 - Avoid losing your data — especially important if you run n8n locally.  
-- Use **n8n-Backup** for a simple all-in-one backup solution.
+- Use **n8n-Backup** for an all-in-one backup solution.  
+- Use **n8n-Workflow-Retrieval** and **n8n-Credentials-Retrieval** for reliable restoration when needed.  
