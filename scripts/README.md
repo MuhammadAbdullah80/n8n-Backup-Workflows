@@ -53,7 +53,21 @@ Restore is a dry run unless `--apply` is passed. Workflow `id`, `createdAt` and
 `set -euo pipefail` throughout means a failure exits non-zero and cron will
 report it rather than logging a success it did not achieve.
 
+## Legacy exports
+
+The JSON files at the repository root predate these scripts and were produced by
+hand. They are kept for reference but are not written or read by anything here;
+`backup.sh` writes to `backups/` instead. See #5.
+
 ## Note on credentials
 
-`credentials.json` contains encrypted credential data from your instance. The
-backup directory is created `0700`. Do not commit real backups to a public repo.
+`credentials.json` contains credential data from your instance. It is protected
+only by directory permissions (`0700`) — it is **not** encrypted at rest by
+these scripts, which is tracked in #2.
+
+Two consequences worth being explicit about:
+
+- `backups/` is in `.gitignore`. Do not force-add it. This repository is public.
+- Storing backups anywhere shared (a NAS, object storage, a synced folder) means
+  storing credential material there in the clear. Wait for #2, or encrypt the
+  directory yourself before it leaves the host.
