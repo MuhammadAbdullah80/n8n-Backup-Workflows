@@ -13,4 +13,4 @@ jobs:
       - name: Syntax check
         run: bash -n scripts/*.sh
       - name: ShellCheck
-        run: shellcheck --severity=style scripts/*.sh
+        run: shellcheck -x --severity=style scripts/*.sh
