@@ -71,13 +71,23 @@ write_manifest() {
 }
 
 # Deletes all but the newest COUNT backup directories.
+#
+# Refuses to run if the directory holds nothing that looks like a backup. A
+# mistyped -o would otherwise point this at an unrelated directory and delete
+# its contents.
 prune_old_backups() {
-	local dir="$1" keep="$2" removed=0
+	local dir="$1" keep="$2" removed=0 total
+
+	total="$(find "${dir}" -mindepth 1 -maxdepth 1 -type d -name '20*' | wc -l)"
+	if (( total == 0 )); then
+		log "nothing to prune in ${dir}"
+		return 0
+	fi
 
 	while IFS= read -r old; do
 		rm -rf -- "${old}"
 		removed=$((removed + 1))
-	done < <(find "${dir}" -mindepth 1 -maxdepth 1 -type d | sort -r | tail -n "+$((keep + 1))")
+	done < <(find "${dir}" -mindepth 1 -maxdepth 1 -type d -name '20*' | sort -r | tail -n "+$((keep + 1))")
 
 	(( removed > 0 )) && log "pruned ${removed} old backup(s)"
 	return 0
