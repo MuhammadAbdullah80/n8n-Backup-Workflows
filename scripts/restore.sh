@@ -58,7 +58,7 @@ main() {
 
 	require_command curl
 	require_command jq
-	require_env N8N_HOST
+	require_host_url
 	require_env N8N_API_KEY
 
 	local count; count="$(jq '.data | length' < "${source_file}")"

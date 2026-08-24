@@ -24,6 +24,19 @@ require_env() {
 	[[ -n "${!name:-}" ]] || die "${name} is not set"
 }
 
+# Aborts unless N8N_HOST looks like an http(s) URL.
+#
+# Setting it to a bare hostname is the most common misconfiguration, and curl
+# then fails per-request with a protocol error that reads like a network
+# problem rather than a config one.
+require_host_url() {
+	require_env N8N_HOST
+	case "${N8N_HOST}" in
+		http://*|https://*) ;;
+		*) die "N8N_HOST must start with http:// or https:// (got '${N8N_HOST}')" ;;
+	esac
+}
+
 # GETs one paginated n8n API resource and emits the combined JSON.
 # n8n returns at most 250 items per page, so this follows the cursor to the end.
 fetch_resource() {

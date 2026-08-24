@@ -42,7 +42,7 @@ main() {
 
 	require_command curl
 	require_command jq
-	require_env N8N_HOST
+	require_host_url
 	require_env N8N_API_KEY
 
 	if ! [[ "${keep}" =~ ^[0-9]+$ ]] || (( keep < 1 )); then
