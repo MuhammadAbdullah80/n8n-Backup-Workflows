@@ -20,7 +20,11 @@ Requires N8N_HOST and N8N_API_KEY in the environment.
 USAGE
 }
 
-# POSTs one workflow, treating a 4xx as fatal and reporting which one failed.
+# Names of workflows that could not be restored, collected across the run.
+declare -a FAILED=()
+
+# POSTs one workflow. A failure is recorded and the run continues: aborting
+# midway leaves the instance half-populated with no record of what landed.
 push_workflow() {
 	local payload="$1" name
 	name="$(printf '%s' "${payload}" | jq -r '.name // "<unnamed>"')"
@@ -33,7 +37,8 @@ push_workflow() {
 		"${N8N_HOST%/}/api/v1/workflows" >/dev/null; then
 		log "restored ${name}"
 	else
-		die "failed restoring ${name}"
+		log "FAILED ${name}"
+		FAILED+=("${name}")
 	fi
 }
 
@@ -77,7 +82,13 @@ main() {
 		push_workflow "${workflow}"
 	done < <(jq -c '.data[] | del(.id, .createdAt, .updatedAt)' < "${source_file}")
 
-	log "restore complete"
+	if (( ${#FAILED[@]} > 0 )); then
+		log "restored $(( count - ${#FAILED[@]} )) of ${count}; ${#FAILED[@]} failed:"
+		for failed_name in "${FAILED[@]}"; do echo "  ${failed_name}" >&2; done
+		return 1
+	fi
+
+	log "restore complete: ${count} workflow(s)"
 }
 
 main "$@"
